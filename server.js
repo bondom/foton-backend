@@ -11,6 +11,7 @@ mongoose.connect('mongodb://localhost:27017/documentdb');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use((req,res,next) => {
+  console.log(`Request: ${req.originalUrl}`);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE')
   next();

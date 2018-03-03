@@ -2,10 +2,11 @@
   <head>
     <script src="encoding.js"></script>
     <script>
+      const API_URL = 'http://localhost:3000/api/documents';
       function getDocuments() {
         const documentsElement = document.getElementsByClassName('documents')[0];
         documentsElement.innerHTML="";
-        fetch('http://localhost:3000/documents', {
+        fetch(API_URL, {
           method: 'GET'
         })
         .then(array => array.json())
@@ -29,7 +30,7 @@
       }
 
       function deleteDocument(documentId) {
-        fetch(`http://localhost:3000/documents/${documentId}`, {
+        fetch(API_URL + documentId, {
           method: 'DELETE'
         })
         .then(doc => {
@@ -118,7 +119,7 @@
             console.log('Oups! Something went wrong.');
           });
 
-          XHR.open('POST', 'http://localhost:3000/documents');
+          XHR.open('POST', API_URL);
           XHR.setRequestHeader('Content-Type','multipart/form-data; boundary=' + boundary);
           XHR.send(data);
         }
