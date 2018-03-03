@@ -24,3 +24,5 @@ routes(app); //register the route
 app.listen(port);
 
 console.log('document RESTful API server started on: ' + port);
+
+// mongod --dbpath /var/lib/mongodb --fork --logpath /var/log/mongodb.log - start mongodb as daemon with log file
