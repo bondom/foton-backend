@@ -6,7 +6,13 @@ var express = require('express'),
   bodyParser = require('body-parser');
 
 mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost:27017/documentdb'); 
+mongoose.connect('mongodb://localhost:27017/documentdb', function(err) {
+  if (err) {
+      console.err('Error when connecting to mongodb:' + err);
+  } else {
+      console.log('Connected');
+  }    
+});
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
