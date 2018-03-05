@@ -10,24 +10,23 @@ exports.get_all_documents = function(req, res) {
   Document.find({}, function(err, documents) {
     if(err)
       res.send(err);
-    if (documents[0]) {  
-      fs.writeFileSync('res-get.pdf', new Buffer(documents[0].document.data, 'base64'));
-    }
     res.json(documents);  
   })
 }  
 
 exports.add_new_document = function(req, res) {
-
-  var model = new Document();
-
   var form = new multiparty.Form();
 
+  form.on('error', function(err) {
+    // stream ended unexpectedly - when there is no file in request 
+    console.log('Error parsing form: ' + err.stack);
+    res.status(400).send('Error occured');
+  });
+
   form.on('part', function(part) {
+    console.log(part);
     if (!part.filename) return;
 
-    var size = part.byteCount;
-    var name = part.filename;
     let base64string = '';
     part.on('data', (chunk) => {
       base64string += chunk.toString();
@@ -41,8 +40,9 @@ exports.add_new_document = function(req, res) {
       console.log(base64stringWithoutMimetype.substring(0, 100));
       // fs.writeFileSync('res2.pdf', new Buffer(base64stringWithoutMimetype, 'base64'));
 
+      var model = new Document();
       model.document.data = base64string; 
-      model.document.name = name;
+      model.document.name =  part.filename;
       model.save(function(err, doc) {
         if (err)
           res.send(err);
