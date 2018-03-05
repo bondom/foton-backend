@@ -8,7 +8,6 @@ var mongoose = require('mongoose'),
 exports.get_all_documents = function(req, res) {
   console.log('get_all_documents executes');
   Document.find({}, function(err, documents) {
-    console.log('Found document:' + JSON.stringify(documents));
     if(err)
       res.send(err);
     res.json(documents);  
