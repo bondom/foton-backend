@@ -10,6 +10,9 @@ exports.get_all_documents = function(req, res) {
   Document.find({}, function(err, documents) {
     if(err)
       res.send(err);
+    if (documents[0]) {  
+      fs.writeFileSync('res-get.pdf', new Buffer(documents[0].document.data, 'base64'));
+    }
     res.json(documents);  
   })
 }  
@@ -19,22 +22,36 @@ exports.add_new_document = function(req, res) {
   var model = new Document();
 
   var form = new multiparty.Form();
-  form.parse(req, function(err, fields, files) {
-    if(files == null || files.length === 0) {
-      res.status(400).send('Please send file');
-      return;
-    }
-    const fileInfo = files.myFile[0];
-    const fileContent = fs.readFileSync(fileInfo.path);
-    // encode to utf-8 bytes and base64 encode
-    model.document.data = Buffer.from(fileContent).toString('base64');
-    model.document.name = fileInfo.originalFilename;
-    model.save(function(err, doc) {
-      if (err)
-        res.send(err);
-      res.send(doc);
+
+  form.on('part', function(part) {
+    if (!part.filename) return;
+
+    var size = part.byteCount;
+    var name = part.filename;
+    let base64string = '';
+    part.on('data', (chunk) => {
+      base64string += chunk.toString();
     });
+
+    part.on('end', (data) => {
+      console.log('end');
+      console.log(base64string.substring(0, 100));
+      //cut off data:application/pdf;base64,
+      const base64stringWithoutMimetype = base64string.substring(base64string.indexOf(',') + 1, base64string.length)
+      console.log(base64stringWithoutMimetype.substring(0, 100));
+      // fs.writeFileSync('res2.pdf', new Buffer(base64stringWithoutMimetype, 'base64'));
+
+      model.document.data = base64string; 
+      model.document.name = name;
+      model.save(function(err, doc) {
+        if (err)
+          res.send(err);
+        res.send(doc);
+      });
+    }); 
   });
+
+  form.parse(req);
 };
 
 exports.delete_a_document = function(req, res) {

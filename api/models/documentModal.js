@@ -6,7 +6,7 @@ var Schema = mongoose.Schema;
 var DocumentSchema = new Schema({
   document: {
     name: String,
-    data: Buffer 
+    data: String 
   },
 });
 
